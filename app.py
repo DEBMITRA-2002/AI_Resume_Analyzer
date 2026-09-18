@@ -11,9 +11,10 @@ from skill_gap import (
     generate_learning_roadmap
 )
 
-# ---------------------------------------------------------
+
+# =========================================================
 # PAGE CONFIGURATION
-# ---------------------------------------------------------
+# =========================================================
 
 st.set_page_config(
     page_title="AI Resume Analyzer",
@@ -21,9 +22,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------------------------------------------------
+
+# =========================================================
 # CUSTOM CSS
-# ---------------------------------------------------------
+# =========================================================
 
 st.markdown(
     """
@@ -37,8 +39,7 @@ st.markdown(
 
     .subtitle {
         font-size: 18px;
-        color: #666;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
     }
 
     .section-title {
@@ -48,21 +49,15 @@ st.markdown(
         margin-bottom: 15px;
     }
 
-    .info-box {
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid #ddd;
-        margin-bottom: 15px;
-    }
-
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# ---------------------------------------------------------
+
+# =========================================================
 # HEADER
-# ---------------------------------------------------------
+# =========================================================
 
 st.markdown(
     '<div class="main-title">📄 AI Resume Analyzer</div>',
@@ -77,24 +72,26 @@ st.markdown(
 )
 
 st.write(
-    "Upload your resume to analyze your skills, "
-    "job-role compatibility, skill gaps, and personalized learning roadmap."
+    "Analyze your resume, discover relevant job roles, "
+    "identify skill gaps, and get a personalized learning roadmap."
 )
 
 st.divider()
 
-# ---------------------------------------------------------
+
+# =========================================================
 # SIDEBAR
-# ---------------------------------------------------------
+# =========================================================
 
 with st.sidebar:
 
-    st.header("⚙️ Project Information")
+    st.header("⚙️ About the Project")
 
     st.write(
         """
-        **AI Resume Analyzer** uses Natural Language Processing
-        and Machine Learning techniques to analyze resumes.
+        This application analyzes resume content using
+        Natural Language Processing and Machine Learning
+        techniques.
         """
     )
 
@@ -105,6 +102,7 @@ with st.sidebar:
         - Python
         - Streamlit
         - Pandas
+        - NumPy
         - Scikit-learn
         - TF-IDF
         - Cosine Similarity
@@ -113,24 +111,32 @@ with st.sidebar:
         """
     )
 
-    st.markdown("### 📌 Features")
+    st.markdown("### ✨ Features")
 
     st.write(
         """
-        ✅ Resume Upload  
-        ✅ Text Extraction  
-        ✅ Text Cleaning  
-        ✅ Skill Detection  
-        ✅ Job Matching  
-        ✅ Top 3 Job Roles  
-        ✅ Skill Gap Analysis  
+        ✅ PDF/DOCX Resume Upload
+
+        ✅ Text Extraction
+
+        ✅ Text Cleaning
+
+        ✅ Skill Detection
+
+        ✅ Job Matching
+
+        ✅ Target Role Selection
+
+        ✅ Skill Gap Analysis
+
         ✅ Learning Roadmap
         """
     )
 
-# ---------------------------------------------------------
+
+# =========================================================
 # RESUME UPLOAD
-# ---------------------------------------------------------
+# =========================================================
 
 st.markdown(
     '<div class="section-title">📤 Upload Your Resume</div>',
@@ -138,14 +144,15 @@ st.markdown(
 )
 
 uploaded_file = st.file_uploader(
-    "Choose your resume file",
+    "Choose your resume",
     type=["pdf", "docx"],
-    help="Upload a PDF or DOCX resume."
+    help="Upload your resume in PDF or DOCX format."
 )
 
-# ---------------------------------------------------------
-# MAIN ANALYSIS
-# ---------------------------------------------------------
+
+# =========================================================
+# MAIN APPLICATION
+# =========================================================
 
 if uploaded_file is not None:
 
@@ -155,65 +162,45 @@ if uploaded_file is not None:
 
     try:
 
-        # -------------------------------------------------
-        # STEP 1: EXTRACT TEXT
-        # -------------------------------------------------
+        # =================================================
+        # 1. TEXT EXTRACTION
+        # =================================================
 
-        resume_text = extract_resume_text(uploaded_file)
+        resume_text = extract_resume_text(
+            uploaded_file
+        )
 
-        # -------------------------------------------------
-        # STEP 2: CLEAN TEXT
-        # -------------------------------------------------
+        # =================================================
+        # 2. TEXT CLEANING
+        # =================================================
 
-        cleaned_text = clean_resume_text(resume_text)
+        cleaned_text = clean_resume_text(
+            resume_text
+        )
 
-        # -------------------------------------------------
-        # STEP 3: EXTRACT SKILLS
-        # -------------------------------------------------
+        # =================================================
+        # 3. SKILL EXTRACTION
+        # =================================================
 
-        found_skills = extract_skills(cleaned_text)
+        found_skills = extract_skills(
+            cleaned_text
+        )
 
         total_skills = sum(
             len(skills)
             for skills in found_skills.values()
         )
 
-        # -------------------------------------------------
-        # STEP 4: JOB MATCHING
-        # -------------------------------------------------
+        # =================================================
+        # 4. JOB ROLE MATCHING
+        # =================================================
 
-        job_results = match_resume_to_jobs(cleaned_text)
-
-        # -------------------------------------------------
-        # TARGET ROLE
-        # -------------------------------------------------
-
-        if not job_results.empty:
-
-            target_role = job_results.iloc[0]["Job Role"]
-
-            required_skills = get_required_skills(
-                target_role
-            )
-
-            missing_skills = find_missing_skills(
-                found_skills,
-                required_skills
-            )
-
-            learning_roadmap = generate_learning_roadmap(
-                missing_skills
-            )
-
-        else:
-
-            target_role = None
-            required_skills = []
-            missing_skills = []
-            learning_roadmap = []
+        job_results = match_resume_to_jobs(
+            cleaned_text
+        )
 
         # =================================================
-        # DASHBOARD SUMMARY
+        # SUMMARY METRICS
         # =================================================
 
         st.markdown(
@@ -224,54 +211,58 @@ if uploaded_file is not None:
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
+
             st.metric(
-                "Skills Detected",
+                "🧠 Skills Detected",
                 total_skills
             )
 
         with col2:
 
             if not job_results.empty:
+
                 highest_score = job_results.iloc[0]["Match Score"]
 
                 st.metric(
-                    "Highest Match",
+                    "📈 Highest Match",
                     f"{highest_score:.2f}%"
                 )
 
             else:
+
                 st.metric(
-                    "Highest Match",
+                    "📈 Highest Match",
                     "N/A"
                 )
 
         with col3:
 
             st.metric(
-                "Job Roles",
+                "💼 Job Roles",
                 len(job_results)
             )
 
         with col4:
 
             st.metric(
-                "Skill Gaps",
-                len(missing_skills)
+                "🔍 Skill Gaps",
+                "Select Role"
             )
 
+
         # =================================================
-        # RESUME TEXT
+        # EXTRACTED RESUME TEXT
         # =================================================
 
         st.markdown(
-            '<div class="section-title">📄 Extracted Resume Text</div>',
+            '<div class="section-title">📄 Resume Text Analysis</div>',
             unsafe_allow_html=True
         )
 
         if cleaned_text.strip():
 
             with st.expander(
-                "View cleaned resume text"
+                "🔎 View Extracted & Cleaned Resume Text"
             ):
 
                 st.text_area(
@@ -290,8 +281,9 @@ if uploaded_file is not None:
                 "No text could be extracted from this resume."
             )
 
+
         # =================================================
-        # SKILLS DETECTED
+        # SKILL DETECTION
         # =================================================
 
         st.markdown(
@@ -312,7 +304,9 @@ if uploaded_file is not None:
                     for skill in skills
                 )
 
-                st.write(skill_text)
+                st.write(
+                    skill_text
+                )
 
         else:
 
@@ -320,6 +314,7 @@ if uploaded_file is not None:
                 "No matching skills were detected "
                 "from the current skill dictionary."
             )
+
 
         # =================================================
         # JOB ROLE MATCHING
@@ -331,7 +326,7 @@ if uploaded_file is not None:
         )
 
         st.write(
-            "The resume is compared with available job roles "
+            "The resume is compared with predefined job roles "
             "using TF-IDF and cosine similarity."
         )
 
@@ -340,9 +335,8 @@ if uploaded_file is not None:
             display_results = job_results.copy()
 
             display_results["Match Score"] = (
-                display_results["Match Score"].map(
-                    lambda x: f"{x:.2f}%"
-                )
+                display_results["Match Score"]
+                .map(lambda x: f"{x:.2f}%")
             )
 
             st.dataframe(
@@ -351,12 +345,19 @@ if uploaded_file is not None:
                 hide_index=True
             )
 
+        else:
+
+            st.warning(
+                "No job-role matching results available."
+            )
+
+
         # =================================================
-        # TOP 3 ROLES
+        # TOP 3 JOB ROLES
         # =================================================
 
         st.markdown(
-            '<div class="section-title">🏆 Top 3 Job Roles</div>',
+            '<div class="section-title">🏆 Top 3 Matching Job Roles</div>',
             unsafe_allow_html=True
         )
 
@@ -371,10 +372,7 @@ if uploaded_file is not None:
             top_3.insert(
                 0,
                 "Rank",
-                range(
-                    1,
-                    len(top_3) + 1
-                )
+                range(1, len(top_3) + 1)
             )
 
             st.dataframe(
@@ -382,8 +380,6 @@ if uploaded_file is not None:
                 use_container_width=True,
                 hide_index=True
             )
-
-            # Role cards
 
             columns = st.columns(
                 len(top_3)
@@ -409,6 +405,7 @@ if uploaded_file is not None:
                         f"{score:.2f}%"
                     )
 
+
         # =================================================
         # MATCH SCORE CHART
         # =================================================
@@ -431,19 +428,59 @@ if uploaded_file is not None:
                 use_container_width=True
             )
 
+
         # =================================================
-        # TARGET ROLE ANALYSIS
+        # TARGET JOB ROLE SELECTION
         # =================================================
 
-        if target_role:
+        st.markdown(
+            '<div class="section-title">🎯 Select Your Target Job Role</div>',
+            unsafe_allow_html=True
+        )
 
-            st.markdown(
-                '<div class="section-title">🎯 Target Role Analysis</div>',
-                unsafe_allow_html=True
+        if not job_results.empty:
+
+            role_options = job_results["Job Role"].tolist()
+
+            default_role = job_results.iloc[0]["Job Role"]
+
+            target_role = st.selectbox(
+                "Choose the job role you want to analyze:",
+                role_options,
+                index=role_options.index(default_role)
             )
 
             st.info(
-                f"Highest matching role: **{target_role}**"
+                f"🎯 Selected Target Role: **{target_role}**"
+            )
+
+
+            # =============================================
+            # SELECTED ROLE SCORE
+            # =============================================
+
+            selected_row = job_results[
+                job_results["Job Role"] == target_role
+            ]
+
+            if not selected_row.empty:
+
+                selected_score = selected_row.iloc[0][
+                    "Match Score"
+                ]
+
+                st.metric(
+                    "Target Role Match Score",
+                    f"{selected_score:.2f}%"
+                )
+
+
+            # =============================================
+            # REQUIRED SKILLS
+            # =============================================
+
+            required_skills = get_required_skills(
+                target_role
             )
 
             st.markdown(
@@ -456,20 +493,24 @@ if uploaded_file is not None:
                     ", ".join(required_skills)
                 )
 
-        # =================================================
-        # SKILL GAP ANALYSIS
-        # =================================================
+            else:
 
-        st.markdown(
-            '<div class="section-title">🔍 Skill Gap Analysis</div>',
-            unsafe_allow_html=True
-        )
+                st.info(
+                    "No required skills found."
+                )
 
-        if target_role:
 
-            st.write(
-                f"Skills required for **{target_role}** "
-                "that were not detected in the resume:"
+            # =============================================
+            # SKILL GAP ANALYSIS
+            # =============================================
+
+            missing_skills = find_missing_skills(
+                found_skills,
+                required_skills
+            )
+
+            st.markdown(
+                "### 🔍 Skill Gap Analysis"
             )
 
             if missing_skills:
@@ -492,76 +533,102 @@ if uploaded_file is not None:
                     "from the current skill dictionary! 🎉"
                 )
 
+
+            # =============================================
+            # LEARNING ROADMAP
+            # =============================================
+
+            st.markdown(
+                "### 📚 Personalized Learning Roadmap"
+            )
+
+            learning_roadmap = generate_learning_roadmap(
+                missing_skills
+            )
+
+            if learning_roadmap:
+
+                roadmap_df = pd.DataFrame(
+                    learning_roadmap
+                )
+
+                st.dataframe(
+                    roadmap_df,
+                    use_container_width=True,
+                    hide_index=True
+                )
+
+            else:
+
+                st.success(
+                    "No additional learning roadmap is required "
+                    "based on the detected skills. 🎉"
+                )
+
+
         # =================================================
-        # LEARNING ROADMAP
+        # HOW THE SYSTEM WORKS
         # =================================================
 
         st.markdown(
-            '<div class="section-title">📚 Personalized Learning Roadmap</div>',
-            unsafe_allow_html=True
-        )
-
-        if learning_roadmap:
-
-            roadmap_df = pd.DataFrame(
-                learning_roadmap
-            )
-
-            st.dataframe(
-                roadmap_df,
-                use_container_width=True,
-                hide_index=True
-            )
-
-        else:
-
-            st.success(
-                "No additional learning roadmap is required "
-                "based on the detected skills. 🎉"
-            )
-
-        # =================================================
-        # PROJECT INFORMATION
-        # =================================================
-
-        st.markdown(
-            '<div class="section-title">ℹ️ Analysis Information</div>',
+            '<div class="section-title">🔄 How the System Works</div>',
             unsafe_allow_html=True
         )
 
         st.write(
             """
-            **How the system works:**
+            **Step 1:** Upload a PDF or DOCX resume.
 
-            1. Resume is uploaded in PDF/DOCX format.
-            2. Text is extracted from the resume.
-            3. Extracted text is cleaned and normalized.
-            4. Technical skills are identified.
-            5. Resume is compared with job-role requirements.
-            6. TF-IDF and cosine similarity are used for matching.
-            7. Skill gaps are identified.
-            8. A learning roadmap is generated.
+            **Step 2:** Extract text from the uploaded resume.
+
+            **Step 3:** Clean and normalize the extracted text.
+
+            **Step 4:** Detect technical skills using a predefined
+            skill dictionary.
+
+            **Step 5:** Compare the resume with predefined job roles.
+
+            **Step 6:** Calculate similarity using TF-IDF and
+            cosine similarity.
+
+            **Step 7:** Display job-role match scores and top
+            matching roles.
+
+            **Step 8:** Select a target job role.
+
+            **Step 9:** Identify missing skills.
+
+            **Step 10:** Generate a personalized learning roadmap.
             """
         )
 
+
         # =================================================
-        # DISCLAIMER
+        # RESPONSIBLE AI
         # =================================================
 
         st.divider()
 
         st.warning(
             """
-            ⚠️ **Important:** Match scores are estimates based on
-            resume content and predefined job-role requirements.
+            ⚠️ **Responsible AI Notice**
 
-            This system is intended for career guidance and should
-            not be used as an automatic hiring or rejection system.
+            Match scores are estimates based on resume content
+            and predefined job-role requirements.
 
-            A missing keyword does not necessarily mean that the
+            This application is intended for career guidance and
+            should not be used as an automatic hiring or rejection
+            system.
+
+            A missing keyword does not necessarily mean that a
             candidate lacks the underlying ability.
             """
         )
+
+
+    # =====================================================
+    # ERROR HANDLING
+    # =====================================================
 
     except Exception as e:
 
@@ -569,18 +636,19 @@ if uploaded_file is not None:
             f"❌ An error occurred while processing the resume: {e}"
         )
 
-else:
 
-    # -----------------------------------------------------
-    # BEFORE UPLOAD
-    # -----------------------------------------------------
+# =========================================================
+# BEFORE RESUME UPLOAD
+# =========================================================
+
+else:
 
     st.info(
         "👆 Please upload a PDF or DOCX resume to start the analysis."
     )
 
     st.markdown(
-        '<div class="section-title">✨ What This Application Does</div>',
+        '<div class="section-title">✨ Application Features</div>',
         unsafe_allow_html=True
     )
 
@@ -592,8 +660,8 @@ else:
             """
             ### 📄 Resume Analysis
 
-            Extracts and cleans text
-            from PDF and DOCX resumes.
+            Extract and clean resume text
+            from PDF and DOCX files.
             """
         )
 
@@ -603,8 +671,8 @@ else:
             """
             ### 💼 Job Matching
 
-            Compares resume content
-            with multiple job roles.
+            Compare your resume with
+            multiple job roles.
             """
         )
 
@@ -612,9 +680,9 @@ else:
 
         st.markdown(
             """
-            ### 📚 Skill Roadmap
+            ### 📚 Career Roadmap
 
-            Identifies skill gaps and
-            provides learning guidance.
+            Identify skill gaps and
+            generate learning guidance.
             """
         )
